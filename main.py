@@ -179,10 +179,11 @@ class Gui(object):
         self.__number = len(self.manager.pages.keys()) + 1
         self.window = gtk.Window()
         self.window.set_title("Gread Diary")
+        self.__icon = self.window.render_icon(gtk.STOCK_ORIENTATION_PORTRAIT, gtk.ICON_SIZE_MENU)
+        self.window.set_icon(self.__icon)
         self.window.set_size_request(660,500)
         self.window.set_resizable(True)
         self.window.connect("destroy", self.destroy)
-        self.__icon_new = self.window.render_icon(gtk.STOCK_NEW, gtk.ICON_SIZE_MENU)
         
         self.new_button = gtk.ToolButton(gtk.STOCK_NEW)
         self.new_button.connect("clicked", self.new)
@@ -193,6 +194,8 @@ class Gui(object):
         self.convert_button = gtk.ToolButton(gtk.STOCK_CONVERT)
         self.convert_button.connect("clicked", self.__convert)
 
+        self.about_button = gtk.ToolButton(gtk.STOCK_ABOUT)
+        self.about_button.connect("clicked", self.__about)
 
         self.back_button = gtk.ToolButton(gtk.STOCK_GO_BACK)
         self.back_button.connect("clicked", self.__go_back)
@@ -217,6 +220,7 @@ class Gui(object):
         self.panel_bar.add(self.new_button)
         self.panel_bar.add(self.save_button)
         self.panel_bar.add(self.convert_button)
+        self.panel_bar.add(self.about_button)
         self.panel_bar.add(self.space_button_two)
         self.panel_bar.add(self.number_button)
         self.panel_bar.add(self.forward_button)
@@ -246,6 +250,18 @@ class Gui(object):
         
     def __go_back(self, view=None, menu=None):
         self.show_page(self.__number - 1)
+
+    def __about(self, view=None, menu=None):
+        about = gtk.AboutDialog()
+        about.set_program_name("Great Diary")
+        about.set_version("2.0")
+        about.set_copyright("(c) Lorenzo Setale")
+        about.set_comments("A symple diary written with python, gtk, webkit and using sqlite as storage!")
+        about.set_website("http://code.google.com/p/greatdiary/")
+        about.set_logo(self.window.render_icon(gtk.STOCK_ORIENTATION_PORTRAIT, gtk.ICON_SIZE_DIALOG))
+        about.run()
+        about.destroy()
+
 
     def __convert(self, view=None, menu=None): db2html(password=self.manager.tmp_password)
 
