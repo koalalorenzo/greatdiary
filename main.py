@@ -30,7 +30,7 @@ def dialog_info(info):
     dialog.run()
     dialog.destroy()
 
-def dialog_get_password():
+def dialog_get_password(motivo="This will be used for <i>identification</i> purposes"):
     """
     This function ask for password.
     """
@@ -40,7 +40,7 @@ def dialog_get_password():
         gtk.MESSAGE_QUESTION,
         gtk.BUTTONS_OK,
         None)
-    dialog.set_markup("""Please enter the <b>password</b>""")
+    dialog.set_markup("Please enter the <b>password</b>")
     def responseToDialog(entry, dialog, response):
         dialog.response(response)
     entry = gtk.Entry()
@@ -50,7 +50,7 @@ def dialog_get_password():
     hbox.pack_start(gtk.Label("Password:"), False, 5, 5)
     hbox.pack_end(entry)
 
-    dialog.format_secondary_markup("This will be used for <i>identification</i> purposes")
+    dialog.format_secondary_markup(motivo)
     dialog.vbox.pack_end(hbox, True, True, 0)
     dialog.show_all()
     dialog.run()
@@ -339,7 +339,7 @@ if __name__ == "__main__":
         print "Generating the database:",
         database = sqlite.connect("database.sql")
         cursor =  database.cursor()
-        password = dialog_get_password()
+        password = dialog_get_password(motivo="This will be used to crypt the pages and database")
         salt = get_salt()
         cursor.execute("CREATE TABLE pages (number INTEGER NOT NULL PRIMARY KEY, date TEXT NOT NULL, text TEXT NOT NULL)")
         cursor.execute("CREATE TABLE settings (key TEXT NOT NULL, value TEXT NOT NULL)")
