@@ -129,17 +129,17 @@ class PagesManager(object):
     """
     This class manage the pages and the database.
     """
-    def __init__(self, database=None):
+    def __init__(self, database_path):
         self.pages = dict()
         self.settings = dict()
-        self.__load_database(database)
+        self.__load_database(database_path)
         if self.settings["is_crypted"]:
             self.tmp_password = ""
 
-    def __load_database(self, database=None):
-        if not database:
-            database = "./database.sql"
-        self.database = sqlite.connect(database)
+    def __load_database(self, database_path):
+        if not database_path:
+            database_path = "./database.sql"
+        self.database = sqlite.connect(database_path)
         self.cursor =  self.database.cursor()
         eget = self.cursor.execute("SELECT * FROM settings")
         for ( key, value ) in eget:
@@ -187,8 +187,8 @@ class Gui(object):
     """
     This class manages, builds and destroys the windows.
     """
-    def __init__(self):
-        self.manager = PagesManager()
+    def __init__(self, database_path="database.sql"):
+        self.manager = PagesManager(database_path)
         if self.manager.settings["is_crypted"]:
             self.manager.tmp_password = dialog_get_password()
             if not self.manager.check_passwd():
@@ -335,9 +335,11 @@ class Gui(object):
         gtk.main_quit()
 
 if __name__ == "__main__":
-    if not os.path.isfile("database.sql"):
+    DEF_DB_PATH = "./database.sql"
+    if not os.path.isfile(DEF_DB_PATH):
+        dialog_info("This is thefirst time that you run Great Diary. Now we are going to generate the database and then we will crypt them by a password.")
         print "Generating the database:",
-        database = sqlite.connect("database.sql")
+        database = sqlite.connect(DEF_DB_PATH)
         cursor =  database.cursor()
         password = dialog_get_password(motivo="This will be used to crypt the pages and database")
         salt = get_salt()
@@ -349,5 +351,6 @@ if __name__ == "__main__":
         database.commit()
         database.close()
         print "done"
-    c = Gui()
+        dialog_info("Done! Everything is OK! Now you can use GreatDiary")
+    c = Gui(database_path=DEF_DB_PATH)
     gtk.main()
