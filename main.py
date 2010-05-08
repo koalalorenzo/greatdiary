@@ -15,10 +15,10 @@ from sqlite3 import dbapi2 as sqlite
 
 gobject.threads_init()
 
-def responseToDialog(entry, dialog, response):
-    dialog.response(response)
-
 def dialog_info(info):
+    """
+    this function show a info dialog.
+    """
     dialog = gtk.MessageDialog(
         None,
         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
@@ -31,6 +31,9 @@ def dialog_info(info):
     dialog.destroy()
 
 def dialog_get_password():
+    """
+    This function ask for password.
+    """
     dialog = gtk.MessageDialog(
         None,
         gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
@@ -38,8 +41,10 @@ def dialog_get_password():
         gtk.BUTTONS_OK,
         None)
     dialog.set_markup("""Please enter the <b>password</b>""")
-
+    def responseToDialog(entry, dialog, response):
+        dialog.response(response)
     entry = gtk.Entry()
+    entry.set_visibility(False)
     entry.connect("activate", responseToDialog, dialog, gtk.RESPONSE_OK)
     hbox = gtk.HBox()
     hbox.pack_start(gtk.Label("Password:"), False, 5, 5)
@@ -54,6 +59,9 @@ def dialog_get_password():
     return text
 
 def accent2html(astring):
+    """
+    This 'stupid' function replace accents with the html tag.
+    """
     values = {
         "à": "&agrave;",
         "è": "&egrave;",
@@ -72,10 +80,12 @@ def accent2html(astring):
         astring = astring.replace(lettera,values[lettera])
     return astring
 
-def get_salt(chars = string.letters + string.digits):
-    return random.choice(chars) + random.choice(chars)
+def get_salt(chars = string.letters + string.digits): return random.choice(chars) + random.choice(chars)
 
 def db2html(database="database.sql", password=None):
+    """
+    Use this class to export the database values in html format.
+    """
     if not os.path.exists("%s.dir/" % database):
         os.mkdir("%s.dir/" % database)
     adatabase = sqlite.connect(database)
@@ -100,6 +110,9 @@ def db2html(database="database.sql", password=None):
     dialog_info("diary converted in html pages")
 
 class Page(object):
+    """
+    This class is used to easily manage a diary page.
+    """
     def __init__(self):
         self.meta = dict()
         self.text = str()
@@ -113,6 +126,9 @@ class Page(object):
 
 
 class PagesManager(object):
+    """
+    This class manage the pages and the database.
+    """
     def __init__(self, database=None):
         self.pages = dict()
         self.settings = dict()
@@ -168,6 +184,9 @@ class PagesManager(object):
         self.database.close()
     
 class Gui(object):
+    """
+    This class manages, builds and destroys the windows.
+    """
     def __init__(self):
         self.manager = PagesManager()
         if self.manager.settings["is_crypted"]:
