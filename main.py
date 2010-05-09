@@ -245,7 +245,7 @@ class Gui(object):
         self.panel_bar.add(self.forward_button)
 
         self.webkit = webkit.WebView()
-        self.webkit.connect("populate-popup", self.__hide_menu)
+        #self.webkit.connect("populate-popup", self.__hide_menu)
 
         self.scroll_box = gtk.ScrolledWindow()
         self.scroll_box.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_ALWAYS)
@@ -258,8 +258,15 @@ class Gui(object):
         self.__disable_input()
         self.forward_button.set_sensitive(False)
         self.window.show_all()
-        if len(self.manager.pages.keys()) >= 1:
-            self.show_page(1)
+        self.convert_button.hide()
+        if not len(self.manager.pages.keys()) >= 1:
+            self.back_button.set_sensitive(False)
+            self.forward_button.set_sensitive(False)
+        else:
+            #This allow to go back and read the page
+            self.show_page(len(self.manager.pages.keys()))
+        self.show_intro_page()
+
 
     def __hide_menu(self, view, menu):
         if not self.webkit.get_editable():
@@ -334,8 +341,51 @@ class Gui(object):
         self.manager.close()
         gtk.main_quit()
 
+    def show_intro_page(self):
+        HTML = "<html>"
+        HTML += """<head><style type="text/css">
+.core {
+    clear: none;
+    min-width: 512px;
+    margin: 0 15px 10px 15px;
+    background: #cccccc;
+    padding: 5px 3px;
+    -webkit-border-radius: 13px;
+    -webkit-transition: all 0.1s ease-out;
+    background-color: #babdb6;
+    border: 0px solid #000; box-shadow:0px 0px 15px #000;
+    -webkit-box-shadow: 0px 0px 15px #000;
+}
+.baloon {
+    margin: 5px;
+    border: 1px solid transparent;
+}.title {
+    padding: 5px 0px 0px 5px;
+    text-align: left;
+    font: bold 1.1em "Trebuchet MS", Helvetica, Sans-Serif;
+    background: -webkit-gradient(linear, left top, left bottom, from(#eeeeec), to(#babdb6));
+    -webkit-border-radius: 7px 7px 0px 0px;
+    -webkit-transition: all 0.1s ease-out;
+}
+</style></head>"""
+        HTML += """<body><br><div class="core"><div class="baloon"><div class="title">"""
+        HTML += """Welcome to GreatDiary: Your secret diary!</div>"""
+        HTML += """This is your secret diary, you can write everything you want: your emotions are safe there and are crypted by your password!<br><br> """
+        HTML += """<b>It's easy to use</b>: like a diary you can browse the pages by pressing the """
+        HTML += """two button with the arrows. You can write by clicking to the add-button in the bottom-center of this window and then save"""
+        HTML += """ your page with the save-button.</div></div>"""
+        HTML += """<div style="position: fixed; margin: auto; width: 100%; top: auto; right: 0; bottom: 0; left: 0; background-color: #3b5998;"""
+        HTML += """ border: 0px solid #000; box-shadow:0px 0px 15px #000;"""
+        HTML += """ -webkit-box-shadow: 0px 0px 15px #000; padding: 5px 10px; color: white;"></div></body></html>"""
+        self.webkit.load_string(HTML, "text/html", "iso-8859-15", "intro")
+        self.number_entry.set_editable(False)
+        self.number_entry.set_text(str(len(self.manager.pages.keys())+1))
+        self.__number = len(self.manager.pages.keys())+1
+
 if __name__ == "__main__":
     DEF_DB_PATH = "./database.sql"
+    if len(sys.argv) > 1:
+        DEF_DB_PATH = " ".join(sys.argv[1:])
     if not os.path.isfile(DEF_DB_PATH):
         dialog_info("This is thefirst time that you run Great Diary. Now we are going to generate the database and then we will crypt them by a password.")
         print "Generating the database:",
