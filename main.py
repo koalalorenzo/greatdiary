@@ -398,7 +398,12 @@ if __name__ == "__main__":
         print "Generating the database:",
         database = sqlite.connect(DEF_DB_PATH)
         cursor =  database.cursor()
-        password = dialog_get_password(motivo="This will be used to crypt the pages and database")
+        while 1:
+            password = dialog_get_password(motivo="This will be used to crypt the pages and database.")
+            if len(password) > 3:
+                break
+            else:
+                dialog_info("The password must be longer than 3 lecters")
         salt = get_salt()
         cursor.execute("CREATE TABLE pages (number INTEGER NOT NULL PRIMARY KEY, date TEXT NOT NULL, text TEXT NOT NULL)")
         cursor.execute("CREATE TABLE settings (key TEXT NOT NULL, value TEXT NOT NULL)")
