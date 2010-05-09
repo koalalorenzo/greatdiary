@@ -58,7 +58,7 @@ def dialog_get_password(motivo="This will be used for <i>identification</i> purp
     dialog.destroy()
     return text
 
-def accent2html(astring):
+def accent2html(astring,reverse=False):
     """
     This 'stupid' function replace accents with the html tag.
     """
@@ -73,11 +73,18 @@ def accent2html(astring):
         "Ì": "&Igrave;",
         "Ò": "&Ograve;",
         "Ù": "&Ugrave;",
+        "&nbsp;": " ",
         "!": "&#33;"
         }
-    astring = astring.replace("&","&amp;")
+    if not reverse:
+        astring = astring.replace("&","&amp;")
     for lettera in values.keys():
-        astring = astring.replace(lettera,values[lettera])
+        if reverse:
+            astring = astring.replace(values[lettera],lettera)
+        else:
+            astring = astring.replace(lettera,values[lettera])
+    if reverse:
+        astring = astring.replace("&amp;","&")        
     return astring
 
 def get_salt(chars = string.letters + string.digits): return random.choice(chars) + random.choice(chars)
@@ -330,7 +337,7 @@ class Gui(object):
         else:
             self.back_button.set_sensitive(True)
             self.forward_button.set_sensitive(True)
-        self.webkit.load_string("<html>\n%s</html>" % self.manager.pages[anumber].text, "text/html", "iso-8859-15", "new-page")
+        self.webkit.load_string("<html>\n%s</html>" % self.manager.pages[anumber].text.replace("&amp;nbsp;"," "), "text/html", "iso-8859-15", "new-page")
         self.__number = anumber
         self.number_entry.set_text(str(anumber))
 
